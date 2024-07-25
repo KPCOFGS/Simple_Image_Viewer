@@ -15,12 +15,12 @@ A basic image viewer application built with Python's Tkinter and PIL (Pillow) li
 
 **Clone the repository:**
 ```bash
-git clone 
+git clone https://github.com/KPCOFGS/Simple_Image_Viewer.git
 cd image-viewer
 ```
 **Install the required Python libraries:**
 ```bash
-pip install pillow
+pip install -r requirements.txt
 ```
 ## Usage
 
