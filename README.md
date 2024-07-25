@@ -10,7 +10,7 @@ A basic image viewer application built with Python's Tkinter and PIL (Pillow) li
 * Dynamic Image List: Automatically updates the image list if new images are added to the directory.
 ## Requirements
 * Python 3.x
-* Pillow library (pip install pillow)
+* Pillow library
 ## Installation
 
 **Clone the repository:**
