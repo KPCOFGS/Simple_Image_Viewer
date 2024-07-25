@@ -16,7 +16,7 @@ A basic image viewer application built with Python's Tkinter and PIL (Pillow) li
 **Clone the repository:**
 ```bash
 git clone https://github.com/KPCOFGS/Simple_Image_Viewer.git
-cd image-viewer
+cd Simple_Image_Viewer
 ```
 **Install the required Python libraries:**
 ```bash
