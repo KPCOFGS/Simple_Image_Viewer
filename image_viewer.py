@@ -10,8 +10,16 @@ class ImageViewer:
         self.image_path = image_path
         self.image_list = self.get_image_list()
         self.current_index = self.image_list.index(image_path) if self.image_list else 0
+
+        # Set the root window background color to black
+        self.root.configure(bg='black')
+
         self.image_label = tk.Label(root, bg='black')  # Set background color to black
         self.image_label.pack(fill=tk.BOTH, expand=True)
+
+        # Resolution label setup
+        self.resolution_label = tk.Label(root, text='', bg='black', fg='white', anchor='sw')
+        self.resolution_label.pack(side=tk.BOTTOM, anchor='sw')
 
         # Set up key bindings
         self.root.bind('<Left>', self.show_previous_image)
@@ -20,13 +28,13 @@ class ImageViewer:
 
         # FullScreen Button
         self.full_screen_button = tk.Button(root, text="FullScreen", command=self.toggle_full_screen, bg='black', fg='white')
-        self.full_screen_button.place(x=80, y=5)  # Position button at upper left-middle corner
+        self.full_screen_button.place(x=80, y=5)
 
         # Navigation Buttons
         self.prev_button = tk.Button(root, text="<---", command=self.show_previous_image, bg='black', fg='white')
         self.next_button = tk.Button(root, text="--->", command=self.show_next_image, bg='black', fg='white')
-        self.prev_button.place(x=15, y=5)  # Position button at upper left
-        self.next_button.place(x=180, y=5)  # Position button at upper right
+        self.prev_button.place(x=15, y=5)
+        self.next_button.place(x=180, y=5)
 
         self.full_screen = False
         self.update_image()
@@ -50,7 +58,7 @@ class ImageViewer:
         image_files = []
         for ext in extensions:
             image_files.extend(glob.glob(os.path.join(directory, ext)))
-        image_files.sort(key=lambda x: os.path.splitext(x)[0].lower())  # Sort by filename
+        image_files.sort(key=lambda x: os.path.splitext(x)[0].lower())
         return image_files
 
     def update_image_list(self):
@@ -58,11 +66,10 @@ class ImageViewer:
         if new_image_list != self.image_list:
             self.image_list = new_image_list
             if not self.image_list:
-                self.root.destroy()  # Exit if the list is empty
+                self.root.destroy()
                 return
-            # Ensure the current index is still valid
             self.current_index = min(self.current_index, len(self.image_list) - 1)
-            self.update_image()  # Update the image display
+            self.update_image()
 
     def update_image(self, scale_factor=1.0):
         if not self.image_list:
@@ -71,9 +78,14 @@ class ImageViewer:
         if scale_factor != 1.0:
             width, height = image.size
             new_size = (int(width * scale_factor), int(height * scale_factor))
-            image = image.resize(new_size, Image.LANCZOS)  # Updated to Image.LANCZOS
+            image = image.resize(new_size, Image.LANCZOS)
         self.tk_image = ImageTk.PhotoImage(image)
         self.image_label.config(image=self.tk_image)
+
+        # Update the resolution label
+        resolution_text = f"Resolution: {image.width} x {image.height}"
+        self.resolution_label.config(text=resolution_text)
+
         self.root.title(f"{os.path.basename(self.image_list[self.current_index])}")
 
     def show_previous_image(self, event=None):
@@ -82,7 +94,7 @@ class ImageViewer:
         self.current_index = (self.current_index - 1) % len(self.image_list)
         self.update_image()
         if self.full_screen:
-            self.zoom_to_fit()  # Keep fullscreen mode
+            self.zoom_to_fit()
 
     def show_next_image(self, event=None):
         if not self.image_list:
@@ -90,7 +102,7 @@ class ImageViewer:
         self.current_index = (self.current_index + 1) % len(self.image_list)
         self.update_image()
         if self.full_screen:
-            self.zoom_to_fit()  # Keep fullscreen mode
+            self.zoom_to_fit()
 
     def handle_escape(self, event):
         if self.full_screen:
@@ -101,18 +113,20 @@ class ImageViewer:
     def toggle_full_screen(self, event=None):
         if not self.full_screen:
             self.root.attributes("-fullscreen", True)
-            self.full_screen_button.place_forget()  # Hide the FullScreen button
-            self.prev_button.place_forget()  # Hide the Previous button
-            self.next_button.place_forget()  # Hide the Next button
+            self.full_screen_button.place_forget()
+            self.prev_button.place_forget()
+            self.next_button.place_forget()
+            self.resolution_label.pack_forget()  # Hide resolution label
             self.full_screen = True
             self.zoom_to_fit()
         else:
             self.root.attributes("-fullscreen", False)
-            self.full_screen_button.place(x=80, y=5)  # Show the FullScreen button
-            self.prev_button.place(x=15, y=5)  # Show the Previous button
-            self.next_button.place(x=180, y=5)  # Show the Next button
+            self.full_screen_button.place(x=80, y=5)
+            self.prev_button.place(x=15, y=5)
+            self.next_button.place(x=180, y=5)
+            self.resolution_label.pack(side=tk.BOTTOM, anchor='sw')  # Show resolution label
             self.full_screen = False
-            self.update_image()  # Reset to original size
+            self.update_image()
 
     def zoom_to_fit(self):
         screen_width = self.root.winfo_screenwidth()
@@ -124,7 +138,6 @@ class ImageViewer:
         scale_width = screen_width / width
         scale_height = screen_height / height
 
-        # Use the smaller scale to fit both dimensions
         scale_factor = min(scale_width, scale_height)
         self.update_image(scale_factor)
 
@@ -143,7 +156,7 @@ class ImageViewer:
 
     def check_for_new_images(self):
         self.update_image_list()
-        self.root.after(self.check_interval, self.check_for_new_images)  # Schedule next check
+        self.root.after(self.check_interval, self.check_for_new_images)
 
 def main():
     parser = argparse.ArgumentParser(description="Simple Image Viewer")
