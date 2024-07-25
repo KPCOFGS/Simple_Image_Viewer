@@ -69,8 +69,11 @@ class ImageViewer:
                 self.root.destroy()
                 return
             self.current_index = min(self.current_index, len(self.image_list) - 1)
-            self.update_image()
+            if self.full_screen:
+                self.zoom_to_fit()
 
+            else:
+                self.update_image()
     def update_image(self, scale_factor=1.0):
         if not self.image_list:
             return
@@ -83,7 +86,7 @@ class ImageViewer:
         self.image_label.config(image=self.tk_image)
 
         # Update the resolution label
-        resolution_text = f"Resolution: {image.width} x {image.height}"
+        resolution_text = f"Resolution: {image.width}x{image.height}"
         self.resolution_label.config(text=resolution_text)
 
         self.root.title(f"{os.path.basename(self.image_list[self.current_index])}")
@@ -162,7 +165,9 @@ def main():
     parser = argparse.ArgumentParser(description="Simple Image Viewer")
     parser.add_argument("image", help="Path to the image to start with")
     args = parser.parse_args()
-
+    if not os.path.exists(args.image):
+        print(f"Error: The path '{args.image}' does not exist.")
+        return
     root = tk.Tk()
     viewer = ImageViewer(root, args.image)
     root.mainloop()
