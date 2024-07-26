@@ -62,7 +62,10 @@ class ImageViewer:
         # Periodically check for new images
         self.check_interval = 100  # Check every 5 seconds
         self.check_for_new_images()
-
+        self.root.after(self.check_interval, self.update_image_periodically)
+    def update_image_periodically(self):
+        self.update_and_zoom_image()
+        self.root.after(100, self.update_image_periodically)
     def get_image_list(self):
         directory = os.path.dirname(self.image_path)
         extensions = ['*.png', '*.jpg', '*.jpeg', '*.gif']
@@ -104,11 +107,14 @@ class ImageViewer:
         scale_width = max_width / (width) if width > 0 else 1.0
         scale_height = max_height / (height) if height > 0 else 1.0
         scale_factor = min(scale_width, scale_height)
-
         if scale_factor > 1.0 and self.full_screen == False:
             scale_factor = 1
-        if scale_factor != 1.0:
+        if scale_factor != 1.0 and scale_factor > 0:
             new_size = (int(width * scale_factor), int(height * scale_factor))
+            if new_size[0] == 0:
+                new_size = (1, new_size[1])
+            if new_size[1] == 0:
+                new_size = (new_size[0],1)
             image = image.resize(new_size, Image.LANCZOS)
 
         self.tk_image = ImageTk.PhotoImage(image)
